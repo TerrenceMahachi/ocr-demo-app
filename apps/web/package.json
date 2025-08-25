@@ -1,0 +1,21 @@
+{
+  "name": "ocr-web",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "tw:init": "tailwindcss init -p"
+  },
+  "dependencies": {
+    "next": "14.2.32",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "node-tesseract-ocr": "^2.2.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17"
+  }
+}

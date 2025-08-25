@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: ocr-api
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DB_PATH: /app/apps/api/data/ocr.db
+      OCR_HANDLER_URL: ${OCR_HANDLER_URL:-}
+      OCR_TOKEN: ${OCR_TOKEN:-}
+    volumes:
+      - db-data:/app/apps/api/data
+    ports:
+      - "4000:4000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4000/requests', ()=>process.exit(0)).on('error', ()=>process.exit(1))"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: ocr-web
+    environment:
+      NODE_ENV: production
+      API_BASE: http://api:4000
+      GOOGLE_VISION_PROXY_URL: ${GOOGLE_VISION_PROXY_URL:-}
+      GOOGLE_VISION_PROXY_TOKEN: ${GOOGLE_VISION_PROXY_TOKEN:-}
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/apps/web/public/uploads
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', ()=>process.exit(0)).on('error', ()=>process.exit(1))"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  uploads:
